@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
     lightning::YAML_IO yaml(FLAGS_config);
     std::string lidar_topic = yaml.GetValue<std::string>("common", "lidar_topic");
     std::string imu_topic = yaml.GetValue<std::string>("common", "imu_topic");
+    std::string livox_topic = yaml.GetValue<std::string>("common", "livox_lidar_topic");
 
     rosbag
         /// IMU 的处理
@@ -58,14 +59,15 @@ int main(int argc, char** argv) {
                           return true;
                       })
 
-        /// lidar 的处理
+        /// lidar 的处理（PointCloud2 格式，当 livox topic 相同时会被覆盖）
         .AddPointCloud2Handle(lidar_topic,
                               [&slam](sensor_msgs::msg::PointCloud2::SharedPtr msg) {
                                   slam.ProcessLidar(msg);
                                   return true;
                               })
-        /// livox 的处理
-        .AddLivoxCloudHandle("/livox/lidar",
+
+        /// livox 的处理（CustomMsg 格式，覆盖同 topic 的 PointCloud2 handler）
+        .AddLivoxCloudHandle(livox_topic,
                              [&slam](livox_ros_driver2::msg::CustomMsg::SharedPtr cloud) {
                                  slam.ProcessLidar(cloud);
                                  return true;

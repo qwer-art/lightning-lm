@@ -165,8 +165,14 @@ void SlamSystem::SaveMap(const std::string& path) {
     TiledMap::Options tm_options;
     tm_options.map_path_ = save_path;
 
+    auto keyframes = lio_->GetAllKeyframes();
+    if (keyframes.empty()) {
+        LOG(ERROR) << "no keyframes, skip map saving";
+        return;
+    }
+
     TiledMap tm(tm_options);
-    SE3 start_pose = lio_->GetAllKeyframes().front()->GetOptPose();
+    SE3 start_pose = keyframes.front()->GetOptPose();
     tm.ConvertFromFullPCD(global_map, start_pose, save_path);
 
     pcl::io::savePCDFileBinaryCompressed(save_path + "/global.pcd", *global_map);

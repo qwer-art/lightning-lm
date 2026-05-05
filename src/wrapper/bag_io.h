@@ -61,7 +61,7 @@ class RosbagIO {
 
     /// 通用处理函数
     RosbagIO &AddHandle(const std::string &topic_name, MessageProcessFunction func) {
-        process_func_.emplace(topic_name, func);
+        process_func_[topic_name] = std::move(func);
         return *this;
     }
 
