@@ -846,8 +846,13 @@ bool LidarLoc::Localize(SE3& pose, double& confidence, CloudPtr input, CloudPtr 
     confidence = ndt->getTransformationProbability();
 
     auto tgt = ndt->getInputTarget();
-    if (!tgt->empty()) {
-        pcl::io::savePCDFile("./data/tgt.pcd", *tgt);
+    if (tgt && !tgt->empty()) {
+        PointCloudType tgt_copy;
+        tgt_copy = *tgt;
+        tgt_copy.width = tgt_copy.size();
+        tgt_copy.height = 1;
+        tgt_copy.is_dense = false;
+        pcl::io::savePCDFileBinary("./data/tgt.pcd", tgt_copy);
     }
 
     if (loc_inited_ == false && confidence > options_.min_init_confidence_) {
