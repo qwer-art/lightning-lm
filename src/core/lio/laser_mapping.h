@@ -23,6 +23,8 @@ namespace ui {
 class PangolinWindow;
 }
 
+class DataDumper;
+
 /**
  * laser mapping
  * 目前有个问题：点云在缓存之后，实际处理的并不是最新的那个点云（通常是buffer里的前一个），这是因为bag里的点云用的开始时间戳，导致
@@ -82,6 +84,7 @@ class LaserMapping {
     void SaveMap();
 
     void SetUI(std::shared_ptr<ui::PangolinWindow> ui) { ui_ = ui; }
+    void SetDumper(std::shared_ptr<DataDumper> dumper) { dumper_ = dumper; }
 
     /// 获取关键帧
     Keyframe::Ptr GetKeyframe() const { return last_kf_; }
@@ -225,6 +228,7 @@ class LaserMapping {
     std::list<Keyframe::Ptr> proj_kfs_;  // 投影到当前帧的关键帧
 
     std::shared_ptr<ui::PangolinWindow> ui_ = nullptr;
+    std::shared_ptr<DataDumper> dumper_ = nullptr;
 };
 
 }  // namespace lightning

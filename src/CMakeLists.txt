@@ -3,6 +3,7 @@ add_library(${PROJECT_NAME}.libs SHARED
         common/constant.h
         common/options.cc
         common/params.cc
+        common/data_dumper.cc
 
         io/yaml_io.cc
         io/file_io.cc

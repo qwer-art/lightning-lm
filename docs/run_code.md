@@ -16,7 +16,7 @@ sudo apt install libopencv-dev libpcl-dev pcl-tools libyaml-cpp-dev libgoogle-gl
 
 ```bash
 cd /home/jerett/OpenProject/LidarSlam/lightning-lm
-colcon build --packages-select lightning
+MAKEFLAGS=-j4 colcon build --packages-select lightning
 source install/setup.bash
 ```
 

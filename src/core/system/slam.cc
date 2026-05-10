@@ -51,6 +51,22 @@ bool SlamSystem::Init(const std::string& yaml_path) {
         lio_->SetUI(ui_);
     }
 
+    /// DataDumper 初始化
+    DataDumper::Options dump_options;
+    dump_options.enable = yaml["system"]["dump_enable"].as<bool>(false);
+    if (dump_options.enable) {
+        dump_options.dump_predict = yaml["system"]["dump_predict"].as<bool>(true);
+        dump_options.dump_update = yaml["system"]["dump_update"].as<bool>(true);
+        dump_options.dump_keyframe = yaml["system"]["dump_keyframe"].as<bool>(true);
+        dump_options.dump_scans = yaml["system"]["dump_scans"].as<bool>(true);
+        dump_options.dump_images = yaml["system"]["dump_images"].as<bool>(true);
+        dump_options.output_dir = yaml["system"]["dump_dir"].as<std::string>("./dump_output");
+
+        dumper_ = std::make_shared<DataDumper>(dump_options);
+        lio_->SetDumper(dumper_);
+        LOG(INFO) << "slam with data dumper";
+    }
+
     if (options_.with_gridmap_) {
         g2p5::G2P5::Options opt;
         opt.online_mode_ = options_.online_mode_;
@@ -68,12 +84,22 @@ bool SlamSystem::Init(const std::string& yaml_path) {
                 cv::Mat image = map->ToCV();
                 cv::imshow("map", image);
 
+                if (dumper_ && dumper_->DumpImagesEnabled()) {
+                    dumper_->DumpImage(lio_->GetState().timestamp_, image);
+                }
+
                 if (options_.step_on_kf_) {
                     cv::waitKey(0);
 
                 } else {
                     cv::waitKey(10);
                 }
+            });
+        } else if (dumper_ && dumper_->DumpImagesEnabled()) {
+            /// 不显示但需要 dump
+            g2p5_->SetMapUpdateCallback([this](g2p5::G2P5MapPtr map) {
+                cv::Mat image = map->ToCV();
+                dumper_->DumpImage(lio_->GetState().timestamp_, image);
             });
         }
     }

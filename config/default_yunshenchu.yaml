@@ -68,6 +68,15 @@ system:
   map_path: ./data/new_map/
   pub_tf: true
 
+  # 数据dump配置
+  dump_enable: true         # 总开关，默认关闭
+  dump_predict: true         # dump predict 轨迹 (IMU predict 后)
+  dump_update: true          # dump update 轨迹 (scan matching 后)
+  dump_keyframe: true        # dump 关键帧轨迹
+  dump_scans: true           # dump 点云 (ply)
+  dump_images: true          # dump g2p5 地图图像 (png)
+  dump_dir: "./data/dump_output"  # 输出目录
+
 loop_closing:
   loop_kf_gap: 20       # 每隔多少个关键帧检查一次
   min_id_interval: 20   # 被检查的关键帧ID间隔

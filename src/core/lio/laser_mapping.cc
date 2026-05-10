@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "common/options.h"
+#include "common/data_dumper.h"
 #include "core/lightning_math.hpp"
 #include "laser_mapping.h"
 
@@ -159,6 +160,11 @@ void LaserMapping::ProcessIMU(const lightning::IMUPtr &imu) {
         if (ui_) {
             ui_->UpdateNavState(kf_imu_.GetX());
         }
+
+        /// dump predict state
+        if (dumper_ && dumper_->DumpPredictEnabled() && flg_EKF_inited_) {
+            dumper_->DumpPredictState(kf_imu_.GetX());
+        }
     }
 
     last_timestamp_imu_ = timestamp;
@@ -206,6 +212,14 @@ bool LaserMapping::Run() {
             if (ui_) {
                 ui_->UpdateNavState(kf_.GetX());
                 ui_->UpdateScan(scan_undistort_, kf_.GetX().GetPose());
+            }
+
+            /// dump update state and scan (skip frame)
+            if (dumper_ && dumper_->DumpUpdateEnabled()) {
+                dumper_->DumpUpdateState(kf_.GetX());
+            }
+            if (dumper_ && dumper_->DumpScansEnabled()) {
+                dumper_->DumpScan(kf_.GetX().timestamp_, scan_undistort_);
             }
 
             return false;
@@ -322,6 +336,14 @@ bool LaserMapping::Run() {
         ui_->UpdateScan(scan_down_body_, state_point_.GetPose());
     }
 
+    /// dump update state and scan (normal frame)
+    if (dumper_ && dumper_->DumpUpdateEnabled()) {
+        dumper_->DumpUpdateState(state_point_);
+    }
+    if (dumper_ && dumper_->DumpScansEnabled()) {
+        dumper_->DumpScan(state_point_.timestamp_, scan_down_body_);
+    }
+
     LOG(INFO) << "LIO state: " << state_point_.pos_.transpose() << ", yaw "
               << state_point_.rot_.angleZ<double>() * 180 / M_PI << ", vel: " << state_point_.vel_.transpose()
               << ", grav: " << state_point_.grav_.transpose() << ", grav norm: " << state_point_.grav_.norm();
@@ -384,6 +406,11 @@ void LaserMapping::MakeKF() {
     }
 
     last_kf_ = kf;
+
+    /// dump keyframe state
+    if (dumper_ && dumper_->DumpKeyframeEnabled()) {
+        dumper_->DumpKeyframeState(kf->GetState(), kf->GetOptPose());
+    }
 
     // 有keyframes时更新local map
     Timer::Evaluate([&, this]() { MapIncremental(); }, "    Incremental Mapping");

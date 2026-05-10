@@ -16,6 +16,7 @@
 #include "common/eigen_types.h"
 #include "common/imu.h"
 #include "common/keyframe.h"
+#include "common/data_dumper.h"
 
 namespace lightning {
 
@@ -89,6 +90,7 @@ class SlamSystem {
     std::shared_ptr<LoopClosing> lc_ = nullptr;         // 回环检测
     std::shared_ptr<ui::PangolinWindow> ui_ = nullptr;  // ui
     std::shared_ptr<g2p5::G2P5> g2p5_ = nullptr;        // 栅格地图
+    std::shared_ptr<DataDumper> dumper_ = nullptr;       // 数据dump
 
     Keyframe::Ptr cur_kf_ = nullptr;
 
