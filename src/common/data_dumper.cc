@@ -124,8 +124,26 @@ void DataDumper::DumpScan(double timestamp, CloudPtr cloud) {
     std::string filename = TimestampToFilename(timestamp, ".ply");
     std::string filepath = options_.output_dir + "/scans/" + filename;
 
-    // 保留 IMU 系，不做变换
-    pcl::io::savePLYFileBinary(filepath, *cloud);
+    // 手动写 binary PLY，只含 x y z intensity，避免 PCL 自带 writer 把 padding 字段也写入
+    // 导致 CloudCompare 报 "scalar field #2 数量不匹配"
+    std::ofstream ofs(filepath, std::ios::binary);
+    CHECK(ofs.is_open()) << "Failed to open " << filepath;
+
+    const size_t num = cloud->size();
+    // header
+    ofs << "ply\n"
+        << "format binary_little_endian 1.0\n"
+        << "element vertex " << num << "\n"
+        << "property float x\n"
+        << "property float y\n"
+        << "property float z\n"
+        << "property float intensity\n"
+        << "end_header\n";
+
+    for (const auto& pt : cloud->points) {
+        float data[4] = {pt.x, pt.y, pt.z, pt.intensity};
+        ofs.write(reinterpret_cast<const char*>(data), sizeof(data));
+    }
 
     // 写索引
     scan_index_ << std::fixed << std::setprecision(9) << timestamp << " " << filename << "\n";
