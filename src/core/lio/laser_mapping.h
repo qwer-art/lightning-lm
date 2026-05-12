@@ -209,6 +209,7 @@ class LaserMapping {
     int publish_count_ = 0;
     bool flg_first_scan_ = true;
     bool flg_EKF_inited_ = false;
+    bool gravity_dumped_ = false;
     double lidar_mean_scantime_ = 0.0;
     int scan_num_ = 0;
     int effect_feat_surf_ = 0, frame_num_ = 0, effect_feat_icp_ = 0;

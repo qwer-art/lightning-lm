@@ -50,6 +50,12 @@ class DataDumper {
     /// 文件名用时间戳，同时在 image_index.txt 中记录映射
     void DumpImage(double timestamp, const cv::Mat& image);
 
+    /// 全局配置 dump — 写入 global_config.txt（一次性）
+    /// gravity: 世界系下重力向量
+    /// R_LtoI: 从 LiDAR 到 IMU 的旋转矩阵
+    /// p_LinI: LiDAR 原点在 IMU 坐标系中的位置
+    void DumpGlobalConfig(const Vec3d& gravity, const Mat3d& R_LtoI, const Vec3d& p_LinI);
+
     bool DumpPredictEnabled() const { return options_.enable && options_.dump_predict; }
     bool DumpUpdateEnabled() const { return options_.enable && options_.dump_update; }
     bool DumpKeyframeEnabled() const { return options_.enable && options_.dump_keyframe; }

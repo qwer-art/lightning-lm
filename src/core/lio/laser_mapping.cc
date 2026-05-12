@@ -238,6 +238,12 @@ bool LaserMapping::Run() {
 
     flg_EKF_inited_ = (measures_.lidar_begin_time_ - first_lidar_time_) >= fasterlio::INIT_TIME;
 
+    /// dump global config once after EKF initialized
+    if (flg_EKF_inited_ && !gravity_dumped_ && dumper_) {
+        dumper_->DumpGlobalConfig(kf_.GetX().grav_, offset_R_lidar_fixed_, offset_t_lidar_fixed_);
+        gravity_dumped_ = true;
+    }
+
     /// downsample
     voxel_scan_.setInputCloud(scan_undistort_);
     voxel_scan_.filter(*scan_down_body_);

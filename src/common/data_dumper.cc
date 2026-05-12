@@ -149,6 +149,35 @@ void DataDumper::DumpScan(double timestamp, CloudPtr cloud) {
     scan_index_ << std::fixed << std::setprecision(9) << timestamp << " " << filename << "\n";
 }
 
+void DataDumper::DumpGlobalConfig(const Vec3d& gravity, const Mat3d& R_LtoI, const Vec3d& p_LinI) {
+    std::lock_guard<std::mutex> lock(mtx_);
+
+    std::ofstream ofs(options_.output_dir + "/global_config.txt");
+    CHECK(ofs.is_open()) << "Failed to open global_config.txt";
+
+    Eigen::Quaterniond q_LtoI(R_LtoI);
+
+    ofs << std::fixed << std::setprecision(9);
+
+    ofs << "# gravity\n";
+    ofs << "# gx gy gz\n";
+    ofs << gravity.x() << " " << gravity.y() << " " << gravity.z() << "\n";
+
+    ofs << "\n# R_LtoI\n";
+    ofs << "# rotation from LiDAR to IMU (row-major)\n";
+    ofs << R_LtoI(0, 0) << " " << R_LtoI(0, 1) << " " << R_LtoI(0, 2) << "\n";
+    ofs << R_LtoI(1, 0) << " " << R_LtoI(1, 1) << " " << R_LtoI(1, 2) << "\n";
+    ofs << R_LtoI(2, 0) << " " << R_LtoI(2, 1) << " " << R_LtoI(2, 2) << "\n";
+
+    ofs << "\n# q_LtoI\n";
+    ofs << "# JPL quaternion from LiDAR to IMU (x y z w)\n";
+    ofs << q_LtoI.x() << " " << q_LtoI.y() << " " << q_LtoI.z() << " " << q_LtoI.w() << "\n";
+
+    ofs << "\n# p_LinI\n";
+    ofs << "# LiDAR origin in IMU frame (x y z)\n";
+    ofs << p_LinI.x() << " " << p_LinI.y() << " " << p_LinI.z() << "\n";
+}
+
 void DataDumper::DumpImage(double timestamp, const cv::Mat& image) {
     std::lock_guard<std::mutex> lock(mtx_);
 

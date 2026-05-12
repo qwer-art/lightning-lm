@@ -16,8 +16,7 @@ sudo apt install libopencv-dev libpcl-dev pcl-tools libyaml-cpp-dev libgoogle-gl
 
 ```bash
 cd /home/jerett/OpenProject/LidarSlam/lightning-lm
-MAKEFLAGS=-j4 colcon build --packages-select lightning
-source install/setup.bash
+source init_env.sh
 ```
 
 ## 3. 建图
@@ -28,7 +27,7 @@ source install/setup.bash
 
 ```bash
 cd /home/jerett/OpenProject/LidarSlam/lightning-lm
-source install/setup.bash
+source init_env.sh
 ros2 run lightning run_slam_offline \
   --config ./config/default_yunshenchu.yaml \
   --input_bag /home/jerett/Data/yunshenchu_build3/building3_0.db3
@@ -40,7 +39,7 @@ ros2 run lightning run_slam_offline \
 
 ```bash
 cd /home/jerett/OpenProject/LidarSlam/lightning-lm
-source install/setup.bash
+source init_env.sh
 ros2 run lightning run_slam_online --config ./config/default_yunshenchu.yaml
 ```
 
@@ -74,7 +73,7 @@ pcl_viewer ./data/new_map/global.pcd
 
 ```bash
 cd /home/jerett/OpenProject/LidarSlam/lightning-lm
-source install/setup.bash
+source init_env.sh
 ros2 run lightning run_loc_offline \
   --config ./config/default_yunshenchu.yaml \
   --input_bag /home/jerett/Data/yunshenchu_build3/building3_0.db3
@@ -84,7 +83,7 @@ ros2 run lightning run_loc_offline \
 
 ```bash
 cd /home/jerett/OpenProject/LidarSlam/lightning-lm
-source install/setup.bash
+source init_env.sh
 ros2 run lightning run_loc_online --config ./config/default_yunshenchu.yaml
 ```
 
